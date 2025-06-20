@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { DEFAULT_PAGE_SIZE } from '@/app/constants';
+import { getInteger } from '@/app/helpers/parseQuery';
 
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const pageParam = req.nextUrl.searchParams.get('page') || '1';
-    const page = parseInt(pageParam);
+    const page = getInteger(req.nextUrl.searchParams.get('page'), 'page') || 1;
 
     const { count, error: countError } = await supabase
       .from('customers')
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     }
 
     const totalPages = Math.ceil((count || 0) / DEFAULT_PAGE_SIZE);
-    if (isNaN(page) || page < 1 || (totalPages > 0 && page > totalPages)) {
+    if (page < 1 || (totalPages > 0 && page > totalPages)) {
       throw new Error('Invalid page number');
     }
     

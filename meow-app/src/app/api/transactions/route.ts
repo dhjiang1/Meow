@@ -1,22 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { TransactionRequest } from '@/types/api';
+import { getInteger } from '@/app/helpers/parseQuery';
+import { DEFAULT_PAGE_SIZE } from '@/app/constants';
 
-
-// TODO:
-// - add pagination
 
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
+    const accountId = getInteger(req.nextUrl.searchParams.get('accountId'), 'accountId', true);
+    const page = getInteger(req.nextUrl.searchParams.get('page'), 'page') || 1;
+
+    const { count, error: countError } = await supabase
+      .from('transactions')
+      .select('*', { count: 'exact', head: true })
+      .or(`account_to.eq.${accountId}, account_from.eq.${accountId}`);
+
+    if (countError) {
+      return NextResponse.json({ error: countError.message }, { status: 500 });
+    }
+
+    const totalPages = Math.ceil((count || 0) / DEFAULT_PAGE_SIZE);
+    if (page < 1 || (totalPages > 0 && page > totalPages)) {
+      return NextResponse.json({ error: 'Invalid page number' }, { status: 400 });
+    }
+    
+    const offset = (page - 1) * DEFAULT_PAGE_SIZE;
+
     const { data, error } = await supabase
         .from('transactions')
         .select()
-        .order('created_at', { ascending: false });
+        .or(`account_to.eq.${accountId}, account_from.eq.${accountId}`)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + DEFAULT_PAGE_SIZE - 1);
     if (error) {
       throw new Error(error.message);
     }
-    return NextResponse.json(data);
+    return NextResponse.json({
+      current_page: page,
+      per_page: DEFAULT_PAGE_SIZE,
+      total_pages: totalPages,
+      total_items: count,
+      transactions: data
+    });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Unknown error' }, { status: 500 });
   }
@@ -56,4 +81,19 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Unknown error' }, { status: 500 });
   }
+}
+
+async function getAccountById(customerId: number, accountId: number){
+  if (customerId && accountId) {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('accounts')
+      .select('id')
+      .eq('id', accountId)
+      .eq('customer_id', customerId)
+      .single();
+
+    return data;
+  } 
+  return null;
 }

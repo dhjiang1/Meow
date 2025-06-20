@@ -29,13 +29,6 @@ export interface Transaction {
   created_at: string;
 }
 
-export interface TransactionRequest {
-  accountFromId: number;
-  accountToId: number;
-  amount: number;
-  message?: string;
-}
-
 export interface ApiError {
   error: string;
   status: number;
