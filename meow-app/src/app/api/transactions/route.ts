@@ -22,13 +22,10 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// Using Supabase RPC for atomic transactions
-// The transfer_money function handles all validation and updates atomically
 export async function POST(req: NextRequest) {
   try {
     const { accountFromId, accountToId, amount, message } = await req.json();
   
-    // Basic validation
     if (!accountFromId || !accountToId || !amount) {
       return NextResponse.json({ error: 'accountFromId, accountToId, and amount are required' }, { status: 400 });
     }
@@ -39,7 +36,6 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createClient();
     
-    // Call the database function
     const { data, error } = await supabase.rpc('transfer_money', {
       p_account_from_id: accountFromId,
       p_account_to_id: accountToId,
@@ -51,7 +47,6 @@ export async function POST(req: NextRequest) {
       throw new Error(error.message);
     }
 
-    // Check if the function returned an error
     if (data && data.error) {
       return NextResponse.json({ error: data.error }, { status: 400 });
     }

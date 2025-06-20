@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-
-// TODO:
-// - add pagination for all
-// - generic error handling (using next?)
-// parse query helper
+import { ACCOUNT_CREATION_RETRY_LIMIT } from '@/app/constants';
+import { DEFAULT_PAGE_SIZE } from '@/app/constants';
+import crypto from 'crypto';
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,13 +22,11 @@ export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
     const { customerId, balance, type } = await req.json();
-    // const body = await req.json();
-    // const customerId = getInteger(body.customerId, 'customerId', true);
 
     const customer = await getCustomerById(customerId);
     if (customer) {
       checkValidBalance(balance);
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < ACCOUNT_CREATION_RETRY_LIMIT; i++) {
         const accountNumber = generateAccountNumber();
         const { data, error } = await supabase
           .from('accounts')
@@ -54,7 +50,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      return NextResponse.json({ error: 'Failed to create account number after 10 attempts' }, { status: 400 }); 
+      return NextResponse.json({ error: `Failed to create account number after ${ACCOUNT_CREATION_RETRY_LIMIT} attempts` }, { status: 400 });
     } else {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
     }
@@ -67,28 +63,55 @@ export async function POST(req: NextRequest) {
 async function ALL(req: NextRequest) {
   const supabase = await createClient();
   const customerId = req.nextUrl.searchParams.get('customerId');
+  const pageParam = req.nextUrl.searchParams.get('page') || '1';
+  const page = parseInt(pageParam);
+  
   if (!customerId) {
     return NextResponse.json({ error: 'Customer ID is required' }, { status: 400 });
   }
 
+  const { count, error: countError } = await supabase
+    .from('accounts')
+    .select('*', { count: 'exact', head: true })
+    .eq('customer_id', customerId);
+
+  if (countError) {
+    return NextResponse.json({ error: countError.message }, { status: 500 });
+  }
+
+  const totalPages = Math.ceil((count || 0) / DEFAULT_PAGE_SIZE);
+  if (isNaN(page) || page < 1 || (totalPages > 0 && page > totalPages)) {
+    return NextResponse.json({ error: 'Invalid page number' }, { status: 400 });
+  }
+  
+  const offset = (page - 1) * DEFAULT_PAGE_SIZE;
+
   const { data, error } = await supabase
     .from('accounts')
     .select(
-        `
-        id,
-        account_number,
-        type,
-        balance,
-        customer_id
-        `,
+      `
+      id,
+      account_number,
+      type,
+      balance,
+      customer_id
+      `
     )
     .eq('customer_id', customerId)
     .order('type', { ascending: false })
+    .range(offset, offset + DEFAULT_PAGE_SIZE - 1);
 
   if (error) {
-    throw new Error(error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json(data);
+
+  return NextResponse.json({
+    current_page: page,
+    per_page: DEFAULT_PAGE_SIZE,
+    total_pages: totalPages,
+    total_items: count,
+    accounts: data
+  });
 }
  
 async function ONE(req: NextRequest) {
@@ -118,10 +141,8 @@ async function ONE(req: NextRequest) {
       .eq('customer_id', customerId)
       .single();
 
-    // handle when no account is found with customer id and account id (not entity found error)
-
-    if (error) {
-      throw new Error(error.message);
+    if (!data) {
+      return NextResponse.json({ error: 'Account not found' }, { status: 404 });
     }
     return NextResponse.json(data);
   } catch (err: any) {
@@ -129,12 +150,15 @@ async function ONE(req: NextRequest) {
   }
 }
 
-function generateAccountNumber() {
-  const digits = Array.from({ length: 4 }, () =>
-    Array.from({ length: 4 }, () => Math.floor(Math.random() * 10)).join('')
-  ).join(' ');
-
-  return digits;
+function generateAccountNumber(): string {
+  const groups = Array.from({ length: 4 }, () => {
+    const digits = Array.from({ length: 4 }, () => 
+      crypto.randomInt(0, 10) 
+    ).join('');
+    return digits;
+  });
+  
+  return groups.join(' ');
 }
 
 async function getCustomerById(id: number){
@@ -151,7 +175,7 @@ async function getCustomerById(id: number){
   return null;
 }
 
-function checkValidBalance(balance: any) {
+function checkValidBalance(balance: unknown) {
   if (typeof balance !== 'number') {
     throw new Error('Balance must be a number');
   }

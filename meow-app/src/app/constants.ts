@@ -1,0 +1,2 @@
+export const ACCOUNT_CREATION_RETRY_LIMIT = 10;
+export const DEFAULT_PAGE_SIZE = 25;
