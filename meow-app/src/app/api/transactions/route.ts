@@ -59,6 +59,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Amount must be a positive number' }, { status: 400 });
     }
 
+    if (amount.toString().split('.')[1]?.length > 2) {
+      throw new Error('Amount must have at most 2 decimal places');
+    }
+
     const supabase = await createClient();
     
     const { data, error } = await supabase.rpc('transfer_money', {
