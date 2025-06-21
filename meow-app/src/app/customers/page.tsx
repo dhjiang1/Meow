@@ -55,7 +55,7 @@ export default function CustomersPage() {
       } else {
         setError(data.error || "Failed to load customers");
       }
-    } catch (error) {
+    } catch (err: unknown) {
       setError("Error loading customers");
     } finally {
       setLoading(false);
@@ -103,7 +103,7 @@ export default function CustomersPage() {
       } else {
         setCreateError(data.error || "Failed to create customer");
       }
-    } catch (error) {
+    } catch (err: unknown) {
       setCreateError("Error creating customer");
     } finally {
       setCreateLoading(false);
