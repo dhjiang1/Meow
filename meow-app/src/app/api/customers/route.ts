@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await supabase
       .from('customers')
       .select(`id, name, email`)
+      .order('name', { ascending: true })
       .range(offset, offset + DEFAULT_PAGE_SIZE - 1);
       
     if (error) {

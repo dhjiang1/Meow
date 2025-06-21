@@ -16,13 +16,13 @@ export interface Account {
   account_number: string;
   type: string;
   balance: number;
-  email: string;
+  customer_id: number;
 }
 
 export interface Transaction {
   id: number;
-  account_from_id: number;
-  account_to_id: number;
+  account_from: number;
+  account_to: number;
   amount: number;
   message?: string;
   type: string;
