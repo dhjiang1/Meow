@@ -1,4 +1,5 @@
 import { Transaction } from '@/types/api';
+import { useRouter } from 'next/navigation';
 
 interface TransactionTableProps {
   transactions: Transaction[];
@@ -17,6 +18,8 @@ export default function TransactionTable({
   totalItems,
   onPageChange 
 }: TransactionTableProps) {
+  const router = useRouter();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -57,6 +60,10 @@ export default function TransactionTable({
     }
   };
 
+  const handleAccountClick = (accountId: number, customerId: number) => {
+    router.push(`/customers/${customerId}/accounts/${accountId}`);
+  };
+
   if (transactions.length === 0) {
     return (
       <div className="text-center py-8">
@@ -89,6 +96,9 @@ export default function TransactionTable({
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Date
               </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Message
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -100,13 +110,38 @@ export default function TransactionTable({
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
-                  {transaction.account_from}
+                  {transaction.account_from_details ? (
+                    <button
+                      onClick={() => handleAccountClick(transaction.account_from_details!.id, transaction.account_from_details!.customer_id)}
+                      className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors cursor-pointer"
+                    >
+                      {transaction.account_from}
+                    </button>
+                  ) : (
+                    <span>{transaction.account_from}</span>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
-                  {transaction.account_to}
+                  {transaction.account_to_details ? (
+                    <button
+                      onClick={() => handleAccountClick(transaction.account_to_details!.id, transaction.account_to_details!.customer_id)}
+                      className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors cursor-pointer"
+                    >
+                      {transaction.account_to}
+                    </button>
+                  ) : (
+                    <span>{transaction.account_to}</span>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
                   {formatDate(transaction.created_at)}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-900 text-center">
+                  {transaction.message ? (
+                    <span className="text-gray-700">{transaction.message}</span>
+                  ) : (
+                    <span className="text-gray-400 italic">No message</span>
+                  )}
                 </td>
               </tr>
             ))}

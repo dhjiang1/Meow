@@ -27,6 +27,14 @@ export interface Transaction {
   message?: string;
   type: string;
   created_at: string;
+  account_from_details?: {
+    id: number;
+    customer_id: number;
+  };
+  account_to_details?: {
+    id: number;
+    customer_id: number;
+  };
 }
 
 export interface ApiError {

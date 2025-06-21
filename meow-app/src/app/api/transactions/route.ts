@@ -28,7 +28,17 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await supabase
         .from('transactions')
-        .select()
+        .select(`
+          *,
+          account_from_details:accounts!account_from(
+            id,
+            customer_id
+          ),
+          account_to_details:accounts!account_to(
+            id,
+            customer_id
+          )
+        `)
         .or(`account_to.eq.${accountId}, account_from.eq.${accountId}`)
         .order('created_at', { ascending: false })
         .range(offset, offset + DEFAULT_PAGE_SIZE - 1);

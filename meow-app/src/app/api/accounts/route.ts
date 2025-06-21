@@ -96,7 +96,7 @@ async function ALL(req: NextRequest) {
         `
       )
       .eq('customer_id', customerId)
-      .order('type', { ascending: false })
+      .order('type', { ascending: true })
       .range(offset, offset + DEFAULT_PAGE_SIZE - 1);
   
     if (error) {
