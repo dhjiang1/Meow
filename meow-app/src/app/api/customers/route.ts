@@ -44,3 +44,29 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: errorMessage }, { status });
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const { name, email } = await req.json();
+
+    if (!name || !email) {
+      return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+
+    const { data, error } = await supabase.from("customers").insert({ name, email }).select();
+
+    if (error) {
+      if (error.code === "23505") {
+        return NextResponse.json({ error: "Email already exists" }, { status: 400 });
+      }
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data, { status: 201 });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
+  }
+}

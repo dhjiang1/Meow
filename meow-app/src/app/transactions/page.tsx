@@ -65,7 +65,6 @@ export default function TransactionsPage() {
 
       setAllAccounts(allAccountsData);
     } catch (error) {
-      console.error("Error fetching accounts:", error);
       setMessage("Error loading accounts");
       setShowMessageModal(true);
     }
@@ -96,7 +95,6 @@ export default function TransactionsPage() {
         setCustomers(data.customers);
       }
     } catch (error) {
-      console.error("Error fetching customers:", error);
       setMessage("Error loading customers");
       setShowMessageModal(true);
     }
@@ -158,7 +156,6 @@ export default function TransactionsPage() {
         setShowMessageModal(true);
       }
     } catch (error) {
-      console.error("Error executing transaction:", error);
       setMessage("Error executing transaction");
       setShowMessageModal(true);
     } finally {
