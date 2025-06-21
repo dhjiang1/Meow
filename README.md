@@ -71,6 +71,30 @@ Retrieves all customers with pagination support.
 }
 ```
 
+#### `POST /api/customers`
+Creates a new customer.
+
+**Request Body:**
+```json
+{
+  "name": "test",
+  "email": "test@test.com"
+}
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "name": "test",
+    "email": "test@test.com",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+  }
+]
+```
+
 ### Accounts
 
 #### `GET /api/accounts`
