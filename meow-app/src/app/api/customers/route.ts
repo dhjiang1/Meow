@@ -38,8 +38,9 @@ export async function GET(req: NextRequest) {
       total_items: count,
       customers: data,
     });
-  } catch (err: any) {
-    const status = err.message === "Invalid page number" ? 400 : 500;
-    return NextResponse.json({ error: err.message || "Unknown error" }, { status });
+  } catch (err: unknown) {
+    const status = err instanceof Error && err.message === "Invalid page number" ? 400 : 500;
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status });
   }
 }

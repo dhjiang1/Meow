@@ -14,8 +14,9 @@ export async function GET(req: NextRequest) {
     } else {
       return ALL(req);
     }
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Unknown error" }, { status: 500 });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -59,8 +60,9 @@ export async function POST(req: NextRequest) {
     } else {
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Unknown error" }, { status: 500 });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -112,8 +114,9 @@ async function ALL(req: NextRequest) {
       total_items: count,
       accounts: data,
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Unknown error" }, { status: 500 });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -142,8 +145,9 @@ async function ONE(req: NextRequest) {
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
     return NextResponse.json(data);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Unknown error" }, { status: 500 });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
