@@ -55,7 +55,7 @@ export default function CustomersPage() {
       } else {
         setError(data.error || "Failed to load customers");
       }
-    } catch (err: unknown) {
+    } catch (_err: unknown) {
       setError("Error loading customers");
     } finally {
       setLoading(false);
@@ -103,7 +103,7 @@ export default function CustomersPage() {
       } else {
         setCreateError(data.error || "Failed to create customer");
       }
-    } catch (err: unknown) {
+    } catch (_err: unknown) {
       setCreateError("Error creating customer");
     } finally {
       setCreateLoading(false);
@@ -137,7 +137,7 @@ export default function CustomersPage() {
 
   useEffect(() => {
     fetchCustomers(1, false);
-  }, []);
+  }, [fetchCustomers]);
 
   const getInitials = (name: string) => {
     return name
