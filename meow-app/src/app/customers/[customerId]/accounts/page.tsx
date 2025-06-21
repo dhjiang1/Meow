@@ -61,7 +61,7 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
         } else {
           setError(accountsData.error || "Failed to load accounts");
         }
-      } catch (_err: unknown) {
+      } catch {
         setError("Error loading data");
       } finally {
         setLoading(false);
@@ -109,7 +109,7 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
       } else {
         setCreateError(data.error || "Failed to create account");
       }
-    } catch (_err: unknown) {
+    } catch {
       setCreateError("Error creating account");
     } finally {
       setCreateLoading(false);

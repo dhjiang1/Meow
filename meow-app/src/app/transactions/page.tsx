@@ -64,7 +64,7 @@ export default function TransactionsPage() {
       }
 
       setAllAccounts(allAccountsData);
-    } catch (_err: unknown) {
+    } catch {
       setMessage("Error loading accounts");
       setShowMessageModal(true);
     }
@@ -94,7 +94,7 @@ export default function TransactionsPage() {
       if (data.customers) {
         setCustomers(data.customers);
       }
-    } catch (_err: unknown) {
+    } catch {
       setMessage("Error loading customers");
       setShowMessageModal(true);
     }
@@ -155,7 +155,7 @@ export default function TransactionsPage() {
         setMessage(data.error || "Transaction failed");
         setShowMessageModal(true);
       }
-    } catch (_err: unknown) {
+    } catch {
       setMessage("Error executing transaction");
       setShowMessageModal(true);
     } finally {

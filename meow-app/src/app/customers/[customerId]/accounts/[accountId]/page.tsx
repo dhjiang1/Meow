@@ -75,7 +75,7 @@ export default function AccountPage({ params }: { params: Promise<{ customerId: 
 
         // Fetch initial transactions
         await fetchTransactions(1);
-      } catch (_err: unknown) {
+      } catch {
         setError("Error loading account data");
       } finally {
         setLoading(false);
