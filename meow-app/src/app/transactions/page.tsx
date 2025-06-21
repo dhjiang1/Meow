@@ -32,6 +32,7 @@ export default function TransactionsPage() {
   const [allAccounts, setAllAccounts] = useState<AccountWithCustomer[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedCustomerFrom, setSelectedCustomerFrom] = useState<number | ''>('');
   const [selectedCustomerTo, setSelectedCustomerTo] = useState<number | ''>('');
   const [formData, setFormData] = useState<TransactionForm>({
@@ -51,6 +52,17 @@ export default function TransactionsPage() {
     }
   }, [customers]);
 
+  // Auto-hide message modal after 5 seconds
+  useEffect(() => {
+    if (showMessageModal) {
+      const timer = setTimeout(() => {
+        setShowMessageModal(false);
+        setMessage('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showMessageModal]);
+
   const fetchCustomers = async () => {
     try {
       const response = await fetch('/api/customers');
@@ -61,6 +73,7 @@ export default function TransactionsPage() {
     } catch (error) {
       console.error('Error fetching customers:', error);
       setMessage('Error loading customers');
+      setShowMessageModal(true);
     }
   };
 
@@ -85,6 +98,7 @@ export default function TransactionsPage() {
     } catch (error) {
       console.error('Error fetching accounts:', error);
       setMessage('Error loading accounts');
+      setShowMessageModal(true);
     }
   };
 
@@ -92,15 +106,20 @@ export default function TransactionsPage() {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+    
+    // Scroll to top of page
+    window.scrollTo(0, 0);
 
     if (!formData.accountFromId || !formData.accountToId || !formData.amount) {
       setMessage('Please fill in all required fields');
+      setShowMessageModal(true);
       setLoading(false);
       return;
     }
 
     if (formData.accountFromId === formData.accountToId) {
       setMessage('Source and destination accounts must be different');
+      setShowMessageModal(true);
       setLoading(false);
       return;
     }
@@ -123,6 +142,7 @@ export default function TransactionsPage() {
 
       if (response.ok) {
         setMessage('Transaction completed successfully!');
+        setShowMessageModal(true);
         setFormData({
           accountFromId: '',
           accountToId: '',
@@ -135,10 +155,12 @@ export default function TransactionsPage() {
         fetchAllAccounts();
       } else {
         setMessage(data.error || 'Transaction failed');
+        setShowMessageModal(true);
       }
     } catch (error) {
       console.error('Error executing transaction:', error);
       setMessage('Error executing transaction');
+      setShowMessageModal(true);
     } finally {
       setLoading(false);
     }
@@ -171,8 +193,55 @@ export default function TransactionsPage() {
     return allAccounts.filter(account => account.customer_id === customerId);
   };
 
+  const isSuccessMessage = message.includes('successfully');
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Message Modal */}
+      {showMessageModal && (
+        <div className="fixed top-4 right-4 z-50 max-w-sm w-full">
+          <div className={`rounded-lg shadow-lg border p-4 transform transition-all duration-300 ${
+            isSuccessMessage 
+              ? 'bg-green-50 border-green-200 text-green-800' 
+              : 'bg-red-50 border-red-200 text-red-800'
+          }`}>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                {isSuccessMessage ? (
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+              </div>
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium">{message}</p>
+              </div>
+              <div className="ml-4 flex-shrink-0">
+                <button
+                  onClick={() => {
+                    setShowMessageModal(false);
+                    setMessage('');
+                  }}
+                  className={`inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                    isSuccessMessage 
+                      ? 'text-green-600 hover:bg-green-100 focus:ring-green-500' 
+                      : 'text-red-600 hover:bg-red-100 focus:ring-red-500'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
         <header className="flex justify-between items-center mb-8">
@@ -370,28 +439,6 @@ export default function TransactionsPage() {
                 )}
               </button>
             </form>
-
-            {/* Message Display */}
-            {message && (
-              <div className={`mt-6 p-4 rounded-lg border ${
-                message.includes('successfully') 
-                  ? 'bg-green-50 text-green-800 border-green-200' 
-                  : 'bg-red-50 text-red-800 border-red-200'
-              }`}>
-                <div className="flex items-center">
-                  {message.includes('successfully') ? (
-                    <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  )}
-                  {message}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
