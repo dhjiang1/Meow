@@ -1,4 +1,4 @@
-import { Account } from '@/types/api';
+import { Account } from "@/types/api";
 
 interface AccountCardProps {
   account: Account;
@@ -9,39 +9,39 @@ interface AccountCardProps {
 export default function AccountCard({ account, customerName, onClick }: AccountCardProps) {
   const getAccountTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
-      case 'savings':
-        return 'from-green-400 to-green-500';
-      case 'personal':
-        return 'from-blue-400 to-blue-500';
-      case 'credit':
-        return 'from-purple-400 to-purple-500';
-      case 'business':
-        return 'from-gray-800 to-gray-900';
+      case "savings":
+        return "from-green-400 to-green-500";
+      case "personal":
+        return "from-blue-400 to-blue-500";
+      case "credit":
+        return "from-purple-400 to-purple-500";
+      case "business":
+        return "from-gray-800 to-gray-900";
       default:
-        return 'from-gray-400 to-gray-500';
+        return "from-gray-400 to-gray-500";
     }
   };
 
   const getAccountTypeTextColor = (type: string) => {
     switch (type.toLowerCase()) {
-      case 'savings':
-        return 'text-green-50';
-      case 'personal':
-        return 'text-blue-50';
-      case 'credit':
-        return 'text-purple-50';
-      case 'business':
-        return 'text-gray-50';
+      case "savings":
+        return "text-green-50";
+      case "personal":
+        return "text-blue-50";
+      case "credit":
+        return "text-purple-50";
+      case "business":
+        return "text-gray-50";
       default:
-        return 'text-gray-50';
+        return "text-gray-50";
     }
   };
 
   const formatAccountNumber = (accountNumber: string) => {
     // Format as XXXX XXXX XXXX XXXX
-    const cleaned = accountNumber.replace(/\s/g, '');
+    const cleaned = accountNumber.replace(/\s/g, "");
     const groups = cleaned.match(/.{1,4}/g) || [];
-    return groups.join(' ');
+    return groups.join(" ");
   };
 
   return (
@@ -70,19 +70,13 @@ export default function AccountCard({ account, customerName, onClick }: AccountC
       {/* Card Footer */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-white text-opacity-80 text-xs uppercase tracking-wider mb-1">
-            Cardholder
-          </p>
-          <p className="text-white font-semibold">
-            {customerName}
-          </p>
+          <p className="text-white text-opacity-80 text-xs uppercase tracking-wider mb-1">Cardholder</p>
+          <p className="text-white font-semibold">{customerName}</p>
         </div>
         <div className="text-right">
-          <p className={`text-sm font-medium ${getAccountTypeTextColor(account.type)}`}>
-            {account.type.toUpperCase()}
-          </p>
+          <p className={`text-sm font-medium ${getAccountTypeTextColor(account.type)}`}>{account.type.toUpperCase()}</p>
         </div>
       </div>
     </div>
   );
-} 
+}

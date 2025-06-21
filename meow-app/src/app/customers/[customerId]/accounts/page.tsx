@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
-import { Account, Customer } from '@/types/api';
-import AccountCard from '@/app/components/AccountCard';
+import React, { useEffect, useState, use } from "react";
+import { useRouter } from "next/navigation";
+import { Account, Customer } from "@/types/api";
+import AccountCard from "@/app/components/AccountCard";
 
 interface AccountsResponse {
   accounts: Account[];
@@ -20,35 +20,35 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   const [createLoading, setCreateLoading] = useState<boolean>(false);
-  const [createError, setCreateError] = useState<string>('');
+  const [createError, setCreateError] = useState<string>("");
   const [formData, setFormData] = useState({
-    initialBalance: '',
-    accountType: ''
+    initialBalance: "",
+    accountType: "",
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        setError('');
-        
+        setError("");
+
         // Fetch all customers to find the specific one
-        const customersResponse = await fetch('/api/customers');
+        const customersResponse = await fetch("/api/customers");
         const customersData = await customersResponse.json();
-        
+
         if (customersResponse.ok) {
           const foundCustomer = customersData.customers.find((c: Customer) => c.id.toString() === customerId);
           if (foundCustomer) {
             setCustomer(foundCustomer);
           } else {
-            setError('Customer not found');
+            setError("Customer not found");
             return;
           }
         } else {
-          setError('Failed to load customer information');
+          setError("Failed to load customer information");
           return;
         }
 
@@ -59,11 +59,11 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
         if (accountsResponse.ok) {
           setAccounts(accountsData.accounts);
         } else {
-          setError(accountsData.error || 'Failed to load accounts');
+          setError(accountsData.error || "Failed to load accounts");
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Error loading data');
+        console.error("Error fetching data:", error);
+        setError("Error loading data");
       } finally {
         setLoading(false);
       }
@@ -78,25 +78,25 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.initialBalance || parseFloat(formData.initialBalance) < 0) {
-      setCreateError('Please enter a valid initial balance');
+      setCreateError("Please enter a valid initial balance");
       return;
     }
 
     try {
       setCreateLoading(true);
-      setCreateError('');
+      setCreateError("");
 
-      const response = await fetch('/api/accounts', {
-        method: 'POST',
+      const response = await fetch("/api/accounts", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           customerId: parseInt(customerId),
           balance: parseFloat(parseFloat(formData.initialBalance).toFixed(2)),
-          type: formData.accountType
+          type: formData.accountType,
         }),
       });
 
@@ -104,23 +104,23 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
 
       if (response.ok) {
         // Add the new account to the list
-        setAccounts(prev => [...prev, data[0]]);
+        setAccounts((prev) => [...prev, data[0]]);
         setShowCreateModal(false);
-        setFormData({ initialBalance: '', accountType: '' });
+        setFormData({ initialBalance: "", accountType: "" });
       } else {
-        setCreateError(data.error || 'Failed to create account');
+        setCreateError(data.error || "Failed to create account");
       }
     } catch (error) {
-      console.error('Error creating account:', error);
-      setCreateError('Error creating account');
+      console.error("Error creating account:", error);
+      setCreateError("Error creating account");
     } finally {
       setCreateLoading(false);
     }
   };
 
   const resetForm = () => {
-    setFormData({ initialBalance: '', accountType: '' });
-    setCreateError('');
+    setFormData({ initialBalance: "", accountType: "" });
+    setCreateError("");
   };
 
   if (loading) {
@@ -145,7 +145,7 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
         <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              {customer ? `${customer.name}'s Accounts` : 'Customer Accounts'}
+              {customer ? `${customer.name}'s Accounts` : "Customer Accounts"}
             </h1>
             <p className="text-gray-600">View and manage account information</p>
           </div>
@@ -160,7 +160,7 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
               Create Account
             </button>
             <button
-              onClick={() => router.push('/customers')}
+              onClick={() => router.push("/customers")}
               className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,7 +176,12 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
               <svg className="w-5 h-5 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
               {error}
             </div>
@@ -200,7 +205,12 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                />
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No Accounts Found</h3>
@@ -244,7 +254,12 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center">
                     <svg className="w-4 h-4 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
                     </svg>
                     <span className="text-sm text-red-600">{createError}</span>
                   </div>
@@ -263,7 +278,7 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
                     type="text"
                     id="initialBalance"
                     value={formData.initialBalance}
-                    onChange={(e) => setFormData(prev => ({ ...prev, initialBalance: e.target.value }))}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, initialBalance: e.target.value }))}
                     className="w-full pl-7 pr-3 py-2 border border-gray-300 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="0.00"
                     required
@@ -279,7 +294,7 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
                   type="text"
                   id="accountType"
                   value={formData.accountType}
-                  onChange={(e) => setFormData(prev => ({ ...prev, accountType: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, accountType: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="e.g., checking, savings, credit"
                 />
@@ -307,7 +322,7 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
                       Creating...
                     </div>
                   ) : (
-                    'Create Account'
+                    "Create Account"
                   )}
                 </button>
               </div>
