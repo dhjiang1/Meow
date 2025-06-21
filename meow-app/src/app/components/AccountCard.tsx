@@ -2,20 +2,21 @@ import { Account } from '@/types/api';
 
 interface AccountCardProps {
   account: Account;
-  customerId: string;
   customerName: string;
   onClick?: () => void;
 }
 
-export default function AccountCard({ account, customerId, customerName, onClick }: AccountCardProps) {
+export default function AccountCard({ account, customerName, onClick }: AccountCardProps) {
   const getAccountTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
       case 'savings':
         return 'from-green-400 to-green-500';
-      case 'checking':
+      case 'personal':
         return 'from-blue-400 to-blue-500';
       case 'credit':
         return 'from-purple-400 to-purple-500';
+      case 'business':
+        return 'from-gray-800 to-gray-900';
       default:
         return 'from-gray-400 to-gray-500';
     }
@@ -25,10 +26,12 @@ export default function AccountCard({ account, customerId, customerName, onClick
     switch (type.toLowerCase()) {
       case 'savings':
         return 'text-green-50';
-      case 'checking':
+      case 'personal':
         return 'text-blue-50';
       case 'credit':
         return 'text-purple-50';
+      case 'business':
+        return 'text-gray-50';
       default:
         return 'text-gray-50';
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import { Account, Transaction } from "@/types/api";
-import { use, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import TransactionTable from '@/app/components/TransactionTable';
 
@@ -35,7 +35,7 @@ export default function AccountPage({ params }: { params: Promise<{ customerId: 
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
 
-  const fetchTransactions = async (page: number = 1) => {
+  const fetchTransactions = useCallback(async (page: number = 1) => {
     try {
       const transactionsResponse = await fetch(`/api/transactions?accountId=${accountId}&page=${page}`);
       const transactionsData: TransactionsResponse = await transactionsResponse.json();
@@ -51,7 +51,7 @@ export default function AccountPage({ params }: { params: Promise<{ customerId: 
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
-  };
+  }, [accountId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,7 +81,7 @@ export default function AccountPage({ params }: { params: Promise<{ customerId: 
     };
 
     fetchData();
-  }, [customerId, accountId]);
+  }, [customerId, accountId, fetchTransactions]);
 
   const handlePageChange = (page: number) => {
     fetchTransactions(page);

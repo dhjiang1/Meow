@@ -14,13 +14,6 @@ interface AccountsResponse {
   error?: string;
 }
 
-interface CustomerResponse {
-  id: number;
-  name: string;
-  email: string;
-  error?: string;
-}
-
 export default function AccountsPage({ params }: { params: Promise<{ customerId: string }> }) {
   const { customerId } = use(params);
   const router = useRouter();
@@ -197,7 +190,6 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
               <AccountCard
                 key={account.id}
                 account={account}
-                customerId={customerId}
                 customerName={customer.name}
                 onClick={() => handleAccountClick(account.id)}
               />
@@ -212,7 +204,7 @@ export default function AccountsPage({ params }: { params: Promise<{ customerId:
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No Accounts Found</h3>
-            <p className="text-gray-600">This customer doesn't have any accounts yet.</p>
+            <p className="text-gray-600">This customer doesn`&apos;`t have any accounts yet.</p>
             <button
               onClick={() => setShowCreateModal(true)}
               className="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg shadow-sm text-white hover:bg-blue-700 transition-all duration-200"

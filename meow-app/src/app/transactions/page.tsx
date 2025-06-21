@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Customer, Account } from '@/types/api';
 
@@ -46,11 +46,36 @@ export default function TransactionsPage() {
     fetchCustomers();
   }, []);
 
+  const fetchAllAccounts = useCallback(async () => {
+    try {
+      const allAccountsData: AccountWithCustomer[] = [];
+      
+      for (const customer of customers) {
+        const response = await fetch(`/api/accounts?customerId=${customer.id}`);
+        const data: AccountsResponse = await response.json();
+        if (data.accounts) {
+          const accountsWithCustomer = data.accounts.map(account => ({
+            ...account,
+            customer_name: customer.name,
+            customer_email: customer.email
+          }));
+          allAccountsData.push(...accountsWithCustomer);
+        }
+      }
+      
+      setAllAccounts(allAccountsData);
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
+      setMessage('Error loading accounts');
+      setShowMessageModal(true);
+    }
+  }, [customers]);
+
   useEffect(() => {
     if (customers.length > 0) {
       fetchAllAccounts();
     }
-  }, [customers]);
+  }, [customers, fetchAllAccounts]);
 
   // Auto-hide message modal after 5 seconds
   useEffect(() => {
@@ -73,31 +98,6 @@ export default function TransactionsPage() {
     } catch (error) {
       console.error('Error fetching customers:', error);
       setMessage('Error loading customers');
-      setShowMessageModal(true);
-    }
-  };
-
-  const fetchAllAccounts = async () => {
-    try {
-      const allAccountsData: AccountWithCustomer[] = [];
-      
-      for (const customer of customers) {
-        const response = await fetch(`/api/accounts?customerId=${customer.id}`);
-        const data: AccountsResponse = await response.json();
-        if (data.accounts) {
-          const accountsWithCustomer = data.accounts.map(account => ({
-            ...account,
-            customer_name: customer.name,
-            customer_email: customer.email
-          }));
-          allAccountsData.push(...accountsWithCustomer);
-        }
-      }
-      
-      setAllAccounts(allAccountsData);
-    } catch (error) {
-      console.error('Error fetching accounts:', error);
-      setMessage('Error loading accounts');
       setShowMessageModal(true);
     }
   };

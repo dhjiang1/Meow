@@ -12,7 +12,7 @@ export function getInteger(value: unknown, paramName: string, required: boolean 
     error = `${paramName} should be an integer`;
   }
 
-  let x = parseFloat(value as string);
+  const x = parseFloat(value as string);
   if (!error && (x | 0) !== x) {
     error = `${paramName} should be an integer`;
   }

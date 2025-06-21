@@ -96,18 +96,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message || 'Unknown error' }, { status: 500 });
   }
 }
-
-async function getAccountById(customerId: number, accountId: number){
-  if (customerId && accountId) {
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from('accounts')
-      .select('id')
-      .eq('id', accountId)
-      .eq('customer_id', customerId)
-      .single();
-
-    return data;
-  } 
-  return null;
-}
